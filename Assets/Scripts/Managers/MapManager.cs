@@ -52,6 +52,32 @@ public class MapManager : MonoBehaviour
         intersections.ForEach(intersection => intersection.SetTriggerAndState());
     }
 
+    public MapLane GetClosestLane(Vector3 position,List<MapLane> candidates)
+    {
+        MapLane result = null;
+        float minDist = float.PositiveInfinity;
+
+        // TODO: this should be optimized
+        foreach (var lane in candidates)
+        {
+            if (lane.mapWorldPositions.Count >= 2)
+            {
+                for (int i = 0; i < lane.mapWorldPositions.Count - 1; i++)
+                {
+                    var p0 = lane.mapWorldPositions[i];
+                    var p1 = lane.mapWorldPositions[i + 1];
+                    float d = Utility.SqrDistanceToSegment(p0, p1, position);
+                    if (d < minDist)
+                    {
+                        minDist = d;
+                        result = lane;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     // npc and api
     public MapLane GetClosestLane(Vector3 position)
     {
@@ -67,7 +93,30 @@ public class MapManager : MonoBehaviour
                 {
                     var p0 = lane.mapWorldPositions[i];
                     var p1 = lane.mapWorldPositions[i + 1];
+                    float d = Utility.SqrDistanceToSegment(p0, p1, position);
+                    if (d < minDist)
+                    {
+                        minDist = d;
+                        result = lane;
+                    }
+                }
+            }
+        }
 
+        var intersectionLanes = new List<MapLane>();
+        foreach(var intersection in intersections)
+        {
+            intersectionLanes.AddRange(intersection.GetComponentsInChildren<MapLane>());
+        }
+
+        foreach (var lane in intersectionLanes)
+        {
+            if (lane.mapWorldPositions.Count >= 2)
+            {
+                for (int i = 0; i < lane.mapWorldPositions.Count - 1; i++)
+                {
+                    var p0 = lane.mapWorldPositions[i];
+                    var p1 = lane.mapWorldPositions[i + 1];
                     float d = Utility.SqrDistanceToSegment(p0, p1, position);
                     if (d < minDist)
                     {

@@ -434,5 +434,118 @@ namespace Simulator.Utilities
             float defaultDpi = 96f;
             return Screen.dpi / defaultDpi;
         }
+
+        public static Vector3 Lerp(Vector3 p0,Vector3 p1,float ratio)
+        {
+            Vector3 ret = new Vector3();
+            ret.x = p0.x * ratio + p0.x * (1-ratio);
+            ret.y = p0.y * ratio + p0.y * (1 - ratio);
+            ret.z = p0.z * ratio + p0.z * (1 - ratio);
+            return ret;
+        }
+
+        // point_a : start point of the line
+        // point_b : end point of the line
+        // point_p : center point of the sphere
+        // radius : radius of the sphere
+        // crossing_points : List of the croggin points
+        public static bool isLineCrossingToSphere(Vector3 point_a, Vector3 point_b, Vector3 point_p, float radius, out List<Vector3> crossing_points)
+        {
+            crossing_points = new List<Vector3>();
+            Vector3 vector_ab = point_b - point_a;
+            Vector3 vector_ap = point_p - point_a;
+            Vector3 vector_bp = point_p - point_b;
+            Vector3 normal_ab = Vector3.Normalize(vector_ab);
+            float len_ax = Vector3.Dot(normal_ab,vector_ap);
+            float shortest_distance = 0.0f;
+            if (len_ax < 0)
+            {
+                shortest_distance = vector_ap.magnitude;
+            }
+            else if (len_ax > vector_ab.magnitude)
+            {
+                shortest_distance = vector_bp.magnitude;
+            }
+            else
+            {
+                shortest_distance = Vector3.Cross(normal_ab,vector_ap).magnitude;
+            }
+            Vector3 point_x = point_a + normal_ab * len_ax;
+            if (shortest_distance < radius)
+            {
+                float length = Mathf.Sqrt(radius * radius - Mathf.Pow((point_x - point_p).magnitude, 2.0f));
+                if(length < len_ax)
+                {
+                    crossing_points.Add(point_x - normal_ab * length);
+                }
+                float len_bx = Vector3.Distance(point_b,point_x);
+                if(length < len_bx)
+                {
+                    crossing_points.Add(point_x + normal_ab * length);
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+}
+
+public class FixedRingBuffer<T> : IEnumerable<T>
+{
+    private Queue<T> _queue;
+
+    public int Count => this._queue.Count;
+
+    public int MaxCapacity { get; private set; }
+
+    public FixedRingBuffer(int maxCapacity)
+    {
+        this.MaxCapacity = maxCapacity;
+        this._queue = new Queue<T>(maxCapacity);
+    }
+
+    public void Enqueue(T item)
+    {
+        this._queue.Enqueue(item);
+
+        if (this._queue.Count > this.MaxCapacity)
+        {
+            T removed = this.Dequeue();
+            Console.WriteLine($"キャパシティを超えているため" +
+                $"バッファの先頭データ破棄しました。{removed.ToString()}");
+        }
+    }
+
+    public T Dequeue() => this._queue.Dequeue();
+
+    public T Peek() => this._queue.Peek();
+
+    public IEnumerator<T> GetEnumerator() => this._queue.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => this._queue.GetEnumerator();
+}
+
+public static class IEnumerableExtensions
+{
+    public static TSource FindMin<TSource, TResult>(this IEnumerable<TSource> self,Func<TSource, TResult> selector)
+    {
+        return self.First(c => selector(c).Equals(self.Min(selector)));
+    }
+
+    public static TSource FindMax<TSource, TResult>(this IEnumerable<TSource> self,Func<TSource, TResult> selector)
+    {
+        return self.First(c => selector(c).Equals(self.Max(selector)));
+    }
+
+    public static int FindNearest(this IEnumerable<int> self,int target)
+    {
+        var min = self.Min(c => Math.Abs(c - target));
+        return self.First(c => Math.Abs(c - target) == min);
+    }
+
+    public static float FindNearest(this IEnumerable<float> self, float target)
+    {
+        var min = self.Min(c => Mathf.Abs(c - target));
+        return self.First(c => Mathf.Abs(c - target) == min);
     }
 }

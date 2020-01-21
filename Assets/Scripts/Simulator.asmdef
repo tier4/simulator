@@ -1,14 +1,15 @@
 {
     "name": "Simulator",
     "references": [
-        "Unity.RenderPipelines.HighDefinition.Runtime",
-        "Unity.RenderPipelines.Core.Runtime",
-        "Unity.Postprocessing.Runtime",
-        "Unity.InputSystem",
-        "Simulator.Bridge",
-        "Simulator.Bridge.Ros",
-        "Simulator.Bridge.Cyber",
-        "Simulator.Plugins"
+        "GUID:457756d89b35d2941b3e7b37b4ece6f1",
+        "GUID:df380645f10b7bc4b97d4f5eb6303d95",
+        "GUID:d60799ab2a985554ea1a39cd38695018",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:8c14360cd7563c841b92a26bfe7df07f",
+        "GUID:8666e8f9f4b4ded41bc10cb58d7dc847",
+        "GUID:6962439cf1facd845a3a82a66662bd5a",
+        "GUID:2409dc9767581724ca39638857e3f2e7",
+        "GUID:560b04d1a97f54a4e82edc0cbbb69285"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

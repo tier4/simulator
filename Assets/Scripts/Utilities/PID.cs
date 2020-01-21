@@ -19,6 +19,8 @@ namespace Simulator.Utilities
         public float e_d;
         public float e_i;
         public float windup_guard;
+        private float limit_;
+        private bool limit_setted_ = false;
 
         public PID()
         {
@@ -53,6 +55,12 @@ namespace Simulator.Utilities
             this.e_d = 0f;
             this.e_i = 0f;
             this.windup_guard = 0f;
+        }
+
+        public void SetLimit(float limit)
+        {
+            this.limit_ = limit;
+            this.limit_setted_ = true;
         }
 
         public void SetWindupGuard(float limit)
@@ -95,14 +103,46 @@ namespace Simulator.Utilities
         public float RunCTE()
         {
             // UpdateCTE should be called before RunCTE()
-            return -this.k_p * this.e_p - this.k_d * this.e_d - this.k_i * this.e_i;
+            if (limit_setted_)
+            {
+                float ret = this.k_p * this.e_p + this.k_d * this.e_d + this.k_i * this.e_i;
+                if (ret > limit_)
+                {
+                    ret = limit_;
+                }
+                if (ret < -1 * limit_)
+                {
+                    ret = -1 * limit_;
+                }
+                return ret;
+            }
+            else
+            {
+                return this.k_p * this.e_p + this.k_d * this.e_d + this.k_i * this.e_i;
+            }
         }
 
 
         public float Run()
         {
             // UpdateErrors should be called before Run()
-            return -this.k_p * this.e_p - this.k_d * this.e_d - this.k_i * this.e_i;
+            if (limit_setted_)
+            {
+                float ret = this.k_p * this.e_p + this.k_d * this.e_d + this.k_i * this.e_i;
+                if (ret > limit_)
+                {
+                    ret = limit_;
+                }
+                if (ret < -1 * limit_)
+                {
+                    ret = -1 * limit_;
+                }
+                return ret;
+            }
+            else
+            {
+                return this.k_p * this.e_p + this.k_d * this.e_d + this.k_i * this.e_i;
+            }
         }
     }
 }

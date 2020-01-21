@@ -24,8 +24,8 @@ public class SimulatorManager : MonoBehaviour
             if (_instance == null)
             {
                 _instance = GameObject.FindObjectOfType<SimulatorManager>();
-                if (_instance == null)
-                    Debug.LogError("<color=red>SimulatorManager Not Found!</color>");
+                //if (_instance == null)
+                    //Debug.LogError("<color=red>SimulatorManager Not Found!</color>");
             }
             return _instance;
         }
