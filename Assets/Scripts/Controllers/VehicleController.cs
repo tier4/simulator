@@ -55,6 +55,13 @@ public class VehicleController : AgentController
     private float stickySteering;
     private float stickAcceleraton;
 
+    public delegate void CollsionEnterEvent(Collision c);
+    public delegate void TriggerEnterEvent(Collider c);
+
+    public event CollsionEnterEvent collisionEnter;
+    public event TriggerEnterEvent triggerEnter;
+
+
     public void Update()
     {
         UpdateInput();
@@ -84,7 +91,7 @@ public class VehicleController : AgentController
         if (sticky) return;
 
         SteerInput = AccelInput = BrakeInput = 0f;
-        
+
         // get all inputs
         foreach (var input in inputs)
         {
@@ -102,7 +109,7 @@ public class VehicleController : AgentController
     private void UpdateInputAPI()
     {
         if (!sticky) return;
-        
+
         SteerInput = stickySteering;
         AccelInput = stickAcceleraton;
     }
@@ -125,7 +132,7 @@ public class VehicleController : AgentController
             {
                 if (SteerInput > -turnSignalOffThreshold)
                     actions.LeftTurnSignal = resetTurnIndicator = false;
-                
+
             }
             else
             {
@@ -205,6 +212,10 @@ public class VehicleController : AgentController
 
     void OnCollisionEnter(Collision collision)
     {
+        if (collisionEnter != null)
+        {
+            collisionEnter(collision);
+        }
         int layerMask = LayerMask.GetMask("Obstacle", "Agent", "Pedestrian", "NPC");
         int layer = collision.gameObject.layer;
         string otherLayer = LayerMask.LayerToName(layer);
@@ -220,6 +231,10 @@ public class VehicleController : AgentController
 
     private void OnTriggerEnter(Collider other)
     {
+        if (triggerEnter != null)
+        {
+            triggerEnter(other);
+        }
         int layerMask = LayerMask.GetMask("Obstacle", "Agent", "Pedestrian", "NPC");
         int layer = other.gameObject.layer;
         string otherLayer = LayerMask.LayerToName(layer);
