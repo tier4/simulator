@@ -130,9 +130,9 @@ namespace Simulator.Editor
                     {
                         var extension = bundleType == BundleConfig.BundleTypes.Environment ? SceneExtension : PrefabExtension;
                         var fullPath = Path.Combine(sourcePath, name, $"{name}.{extension}");
-                        
+
                         // NPC type can be both prefab and behaviour script
-                        if (bundleType == BundleConfig.BundleTypes.NPC && !File.Exists(fullPath)) 
+                        if (bundleType == BundleConfig.BundleTypes.NPC && !File.Exists(fullPath))
                         {
                             extension = ScriptExtension;
                             fullPath = Path.Combine(sourcePath, name, $"{name}.{extension}");
@@ -148,7 +148,7 @@ namespace Simulator.Editor
                     }
                     updated.Add(name);
                 }
-                entries = entries.Where(entry => updated.Contains(entry.Key)).ToDictionary(p=>p.Key, p=>p.Value);
+                entries = entries.Where(entry => updated.Contains(entry.Key)).ToDictionary(p => p.Key, p => p.Value);
             }
 
             public void EnableByName(string name)
@@ -288,7 +288,7 @@ namespace Simulator.Editor
 
 
                     var buildArtifacts = new List<(string source, string archiveName)>();
-                    bool mainAssetIsScript = entry.mainAssetFile.EndsWith("."+ScriptExtension);
+                    bool mainAssetIsScript = entry.mainAssetFile.EndsWith("." + ScriptExtension);
                     try
                     {
                         Debug.Log($"building asset:{entry.mainAssetFile} -> " + Path.Combine(outputFolder, $"{thing}_{entry.name}"));
@@ -310,7 +310,8 @@ namespace Simulator.Editor
                         }
 
                         AssetDatabase.Refresh();
-                        if (!mainAssetIsScript) {
+                        if (!mainAssetIsScript)
+                        {
                             var textureBuild = new AssetBundleBuild()
                             {
                                 assetBundleName = $"{manifest.assetGuid}_{thing}_textures",
@@ -375,7 +376,9 @@ namespace Simulator.Editor
                                                             asm.GetName().Name == "UnityEngine" ||
                                                             asm.GetName().Name == "UnityEngine.JSONSerializeModule" ||
                                                             asm.GetName().Name == "UnityEngine.CoreModule" ||
-                                                            asm.GetName().Name == "UnityEngine.PhysicsModule").ToArray();
+                                                            asm.GetName().Name == "UnityEngine.PhysicsModule" ||
+                                                            asm.GetName().Name == "UnityEngine.VehiclesModule"
+                                                            ).ToArray();
 
                             assemblyBuilder.additionalReferences = modules.Select(a => a.Location).ToArray();
 
@@ -450,7 +453,7 @@ namespace Simulator.Editor
 
                         ZipFile archive = ZipFile.Create(Path.Combine(outputFolder, $"{thing}_{entry.name}"));
                         archive.BeginUpdate();
-                        foreach(var file in buildArtifacts.Where(e => e.archiveName != null))
+                        foreach (var file in buildArtifacts.Where(e => e.archiveName != null))
                         {
                             archive.Add(new StaticDiskDataSource(file.source), file.archiveName, CompressionMethod.Stored, true);
                         }
@@ -463,7 +466,7 @@ namespace Simulator.Editor
                     }
                     finally
                     {
-                        foreach(var file in buildArtifacts) 
+                        foreach (var file in buildArtifacts)
                         {
                             SilentDelete(file.source);
                             SilentDelete(file.source + ".meta");
@@ -475,7 +478,7 @@ namespace Simulator.Editor
                 }
                 // these are an artifact of the asset building pipeline and we don't use them
                 SilentDelete(Path.Combine(outputFolder, Path.GetFileName(outputFolder)));
-                SilentDelete(Path.Combine(outputFolder, Path.GetFileName(outputFolder))+".manifest");
+                SilentDelete(Path.Combine(outputFolder, Path.GetFileName(outputFolder)) + ".manifest");
             }
         }
 
@@ -520,7 +523,7 @@ namespace Simulator.Editor
         {
             foreach (var group in buildGroups.Values)
             {
-                group.OnGUI();   
+                group.OnGUI();
             }
 
             GUILayout.Label("Options", EditorStyles.boldLabel);
@@ -906,7 +909,7 @@ namespace Simulator.Editor
                     if (match.Success)
                     {
                         var val = match.Groups[1].Captures[0].Value;
-                        var bundleType = (BundleConfig.BundleTypes) Enum.Parse(typeof(BundleConfig.BundleTypes), val);
+                        var bundleType = (BundleConfig.BundleTypes)Enum.Parse(typeof(BundleConfig.BundleTypes), val);
                         if (i == args.Length - 1)
                             throw new Exception($"-build{val} expects comma seperated environment names!");
 
